@@ -4,7 +4,7 @@ HEADERS = database.h #List of all header files
 SRCS = main.cpp database.cpp #List of all source files
 OBJECTS := $(patsubst %.cpp,%.o,$(SRCS))
 CXX = g++
-CXX_FLAGS = -Wall -std=c++11 -g
+CXX_FLAGS = -Wall -std=c++14 -g
 
 
 .PHONY: default all clean-
