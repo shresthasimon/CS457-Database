@@ -15,7 +15,7 @@ using namespace std;
 //      tableName: the name of the table
 //      attributes: the data of the table (for now)
 //      database: the database in which the table will be located
-database::database(string tableName, string attributes, string database) {
+database::database(string tableName, string attributes, string database){
     this->tableName = tableName;
     this->tableParameters = attributes;
     this->Database = database;
@@ -60,18 +60,3 @@ void database::printTable() {
     //formalities
     cout << "-- " + line << endl;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

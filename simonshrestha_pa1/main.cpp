@@ -6,38 +6,27 @@
 //header libraries/files
 #include <iostream>
 #include "database.h"
-#include <fstream>
 #include <string>
 #include <vector>
 #include <cstdlib>
 
 using namespace std;
 
-//Name: removeCarriageReturn
-//Purpose: to remove the carriage return that appears after every line
-//Parameters:
-//      query: a string which is the command to remove the carriage return from
-void removeCarriageReturn(string& query){
-    string temp;
-    //if the carriage return is not there, leave
-    if(query.find('\r') == string::npos){
-        return;
-    }else{
-        // go through the entire string until the carriage return is found
-        for(unsigned int i = 0; i < query.size(); i++){
-            if(query[i] == '\r'){
-                continue;
-            }else{
-                //once the carriage return is found, delete it from the string
-                temp.push_back(query[i]);
-            }
-        }
-        query = temp;
-        return;
+// Name: makeStringUpper
+//Purpose: do make lowercase letters in a string uppercase
+// Param:
+//      string - The string to make all letters uppercase
+void makeStringUpper(string& string){
+    int i = 0;
+    char c;
+    while(string[i]){
+        c = string[i];
+        putchar(toupper(c));
+        i++;
     }
 }
 
-int main(int argc, char const *argv[]) {
+int main() {
     string inputQuery = "";
     string databaseName = "None";
     string tableName = "None";
@@ -46,45 +35,53 @@ int main(int argc, char const *argv[]) {
     int errorFlag = 0;
     vector<database> databaseVector;
     string attributes = "";
+    cout << "Enter some commands, type .EXIT to exit the program." << endl;
     // run loop until EXIT query is found
-    while(inputQuery != ".EXIT"){
+    while(inputQuery != ".EXIT" || inputQuery != ".exit"){
         //each time read a new line from the file
         getline(cin, inputQuery);
-        //remove the carriage return from each line
-        removeCarriageReturn(inputQuery);
         // CREATE DATABASE
-        if(inputQuery.find("CREATE DATABASE") != string::npos){
+        if(inputQuery.find("CREATE DATABASE") != string::npos || inputQuery.find("create database") != string::npos ){
             //Locate the name of the Database
             databaseName = inputQuery.substr(16, inputQuery.length() - 17);
             //Check if that database already exists, if it does, output error
             // if it doesn't then create it
             errorChecker = system(("mkdir " + databaseName).c_str());
+
             if(errorChecker == 0){
                 // output that the database has been created
                 cout << "-- Database " + databaseName + " created." << endl;
+            }else{
+                cout << "--!Failed to create Database " + databaseName + " because it already exists"  << endl;
             }
           //DROP DATABASE
-        }else if(inputQuery.find("DROP DATABASE") != string::npos){
+        }else if(inputQuery.find("DROP DATABASE") != string::npos || inputQuery.find("drop database") != string::npos ){
             //find the name of the database
             databaseName = inputQuery.substr(14, inputQuery.length() - 15);
             //check if it already exists, if it does, output error
             //otherwise delete it
             errorChecker = system(("rmdir " + databaseName).c_str());
+
             if(errorChecker == 0){
                 cout << "-- Database " + databaseName + " deleted." << endl;
+            }else{
+                cout << "--!Failed to delete Database " + databaseName + " because it doesn't exist"  << endl;
             }
           //USE
-        }else if(inputQuery.find("USE") != string::npos){
+        }else if(inputQuery.find("USE") != string::npos || inputQuery.find("use") != string::npos){
             // Find the name of the database
             Database = inputQuery.substr(4, inputQuery.length() - 5);
             //check if it already is being used, if so output error
             //otherwise use database
             errorChecker = system(("cd " + Database).c_str());
+
             if(errorChecker == 0){
                 cout << "-- Using Database " + Database + "." << endl;
+            }else{
+                cout << "--!Failed to access Database " + databaseName + " because it doesn't exist"  << endl;
             }
           //CREATE TABLE
-        }else if(inputQuery.find("CREATE TABLE") != string::npos){
+        }else if(inputQuery.find("CREATE TABLE") != string::npos || inputQuery.find("create table") != string::npos  ){
             //find name of table
             tableName = inputQuery.substr(13, inputQuery.find("(") - 14);
             //search through database to check if the table already exists
@@ -114,12 +111,12 @@ int main(int argc, char const *argv[]) {
                 }
             }
           //DROP TABLE
-        }else if(inputQuery.find("DROP TABLE") != string::npos){
+        }else if(inputQuery.find("DROP TABLE") != string::npos || inputQuery.find("drop table") != string::npos ){
             // find name of table to drop
             tableName = inputQuery.substr(11, inputQuery.length() - 12);
             // check if the table can be removed, if it can't then report error
             //otherwise remove it
-            errorChecker = system(("rm " + Database + "/" + tableName + ".txt").c=_str());
+            errorChecker = system(("rm " + Database + "/" + tableName + ".txt").c_str());
             if(errorChecker == 0){
                 //remove data and all associations with the table
                 for(unsigned int i = 0; i < databaseVector.size(); ++i){
@@ -128,9 +125,11 @@ int main(int argc, char const *argv[]) {
                     }
                 }
                 cout << "-- Table " + tableName + " deleted." << endl;
+            }else{
+                cout << "--!Failed to delete " + tableName + " because it does not exist." << endl;
             }
           //SELECT
-        }else if(inputQuery.find("SELECT *") != string::npos){
+        }else if(inputQuery.find("SELECT *") != string::npos || inputQuery.find("select *") != string::npos){
             unsigned int i;
             //find the table to be printed
             tableName = inputQuery.substr(14, inputQuery.length() - 15);
@@ -146,7 +145,7 @@ int main(int argc, char const *argv[]) {
                 cout << "--!Failed to query table " + tableName + " because it does not exist." << endl;
             }
           //ALTER TABLE
-        }else if(inputQuery.find("ALTER TABLE") != string::npos){
+        }else if(inputQuery.find("ALTER TABLE") != string::npos || inputQuery.find("alter table") != string::npos ){
             unsigned int i;
             //find the table name
             tableName = inputQuery.substr(12, inputQuery.find("ADD") - 13);
@@ -164,6 +163,11 @@ int main(int argc, char const *argv[]) {
             if(i == databaseVector.size()){
                 cout << "--!Failed to query table " + tableName + " because it does not exist." << endl;
             }
+        }else if(inputQuery == ".EXIT" || inputQuery == ".exit"){
+            break;
+        }
+        else{
+            cout << "--!Not a correct command, try again." << endl;
         }
 
         errorFlag = 0;
